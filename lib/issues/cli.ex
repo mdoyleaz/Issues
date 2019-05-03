@@ -7,14 +7,16 @@ defmodule Issues.CLI do
     """
 
     def run(argv) do
-        parse_args(argv)
+        argv
+        |> parse_args
+        |> process
     end
 
     @doc"""
     handles github user name and project
     """
     def parse_args(argv) do
-        parse = OptionParser.parse(argv, switches: [help: :boolean], aliases: [h: :help])
+        OptionParser.parse(argv, switches: [help: :boolean], aliases: [h: :help])
         |> elem(1)
         |> cli_args()
     end
@@ -44,5 +46,26 @@ defmodule Issues.CLI do
     end
 
 
+    @doc"""
+    Process functions are used to handled command line arguments
+
+    First: 'process(:help)' - This is handled when the :help pattern is matched.
+
+    Second: 'process({user, project, _count})' - This is matched when at least 2 values are recieved.
+            `_count` is an optional field, which allows the default value to be accepted.
+    """
+
+    def process(:help) do
+        IO.puts """
+        Usage: issues <user> <project> [count | #{@default_count}]
+        """
+
+        System.halt(0)
+    end
+
+
+    def process({user, project, _count}) do
+        Issues.GithubIssues.fetch(user, project)
+    end
 
 end
