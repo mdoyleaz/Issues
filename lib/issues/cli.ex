@@ -1,4 +1,6 @@
 defmodule Issues.CLI do
+    import Issues.TableFormatter, only: [print_table_for_columns: 2]
+
     @default_count 4
 
     @moduledoc"""
@@ -64,9 +66,12 @@ defmodule Issues.CLI do
     end
 
 
-    def process({user, project, _count}) do
+    def process({user, project, count}) do
         Issues.GithubIssues.fetch(user, project)
         |> decode_response()
+        |> sort_response()
+        |> last(count)
+        |> print_table_for_columns(["number", "created_at", "title"])
     end
 
     def decode_response({:ok, body}), do: body
@@ -74,6 +79,25 @@ defmodule Issues.CLI do
         IO.puts "Error fetching data from GitHub: #{error["message"]}"
 
         System.halt(2)
+    end
+
+    @doc"""
+    'sort_response', this function we are using to return a sorted list of issues, these are sorted by creation date.
+
+    An anonymous function is used here to determine where the date value is stored in the map.
+    """
+
+    def sort_response(issue_list) do
+        issue_list
+        |> Enum.sort(fn i1, i2 ->
+           i1["created_at"] >= i2["created_at"]
+        end)
+    end
+
+    def last(list, count) do
+        list
+        |> Enum.take(count)
+        |> Enum.reverse
     end
 
 end
