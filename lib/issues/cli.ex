@@ -71,7 +71,7 @@ defmodule Issues.CLI do
         |> decode_response()
         |> sort_response()
         |> last(count)
-        |> print_table_for_columns(["#", "created_at", "title"])
+        |> print_table_for_columns(["Number", "created_at", "title"])
     end
 
     def decode_response({:ok, body}), do: body
