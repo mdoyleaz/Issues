@@ -8,7 +8,7 @@ defmodule Issues.CLI do
     end up generating a table of the last issues in a github project
     """
 
-    def run(argv) do
+    def main(argv) do
         argv
         |> parse_args
         |> process
@@ -71,7 +71,7 @@ defmodule Issues.CLI do
         |> decode_response()
         |> sort_response()
         |> last(count)
-        |> print_table_for_columns(["number", "created_at", "title"])
+        |> print_table_for_columns(["#", "created_at", "title"])
     end
 
     def decode_response({:ok, body}), do: body
@@ -99,5 +99,4 @@ defmodule Issues.CLI do
         |> Enum.take(count)
         |> Enum.reverse
     end
-
 end
